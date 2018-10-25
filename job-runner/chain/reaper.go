@@ -402,8 +402,10 @@ func (r *SuspendedChainReaper) Finalize() {
 	if done {
 		// If chain finished, send final state to RM.
 		if complete {
+			r.logger.Infof("chain is done, all jobs finished successfully")
 			r.chain.SetState(proto.STATE_COMPLETE)
 		} else {
+			r.logger.Infof("chain is done, some jobs failed")
 			r.chain.SetState(proto.STATE_FAIL)
 		}
 		r.chainRepo.Set(r.chain)
@@ -414,6 +416,7 @@ func (r *SuspendedChainReaper) Finalize() {
 	}
 
 	// Chain isn't done - send SuspendedJobChain to RM.
+	r.logger.Infof("chain is not done - sending SJC...")
 	r.chain.SetState(proto.STATE_SUSPENDED)
 	r.chainRepo.Set(r.chain)
 	sjc := r.chain.ToSuspended()
@@ -523,8 +526,10 @@ func (r *StoppedChainReaper) Finalize() {
 	// and send this final state to the RM.
 	_, complete := r.chain.IsDoneRunning()
 	if complete {
+		r.logger.Infof("chain is done, all jobs finished successfully")
 		r.chain.SetState(proto.STATE_COMPLETE)
 	} else {
+		r.logger.Infof("chain is done, some jobs failed")
 		r.chain.SetState(proto.STATE_FAIL)
 	}
 	r.chainRepo.Set(r.chain)
